@@ -25,7 +25,7 @@
                         <div class="layui-form-item">
                             <label for="payname" class="layui-form-label">显示名称</label>
                             <div class="layui-input-inline">
-                                <input type="text" id="payname" name="payname" ay-verify="required" autocomplete="off" value="<?php echo $item['payname'];?>" class="layui-input">
+                                <input type="text" id="payname" name="payname" lay-verify="required" autocomplete="off" value="<?php echo $item['payname'];?>" class="layui-input">
                             </div>
                         </div>
                         <div class="layui-form-item">
@@ -52,8 +52,8 @@
                             <div class="layui-input-inline">
                                 <select name="sign_type" lay-filter="required">
                                     <option value=""></option>
-                                    <option value="RSA">RSA</option>
-                                    <option value="RSA2" selected="">RSA2</option>
+                                    <option value="RSA" <?php if($item['sign_type']=='RSA' ):?>selected=""<?php endif;?>>RSA</option>
+                                    <option value="RSA2" <?php if($item['sign_type']=='RSA2' ):?>selected=""<?php endif;?>>RSA2</option>
                                 </select>
                             </div>
                         </div>

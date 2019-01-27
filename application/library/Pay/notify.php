@@ -85,9 +85,11 @@ class notify
 									//3.1.4 把邮件通知写到消息队列中，然后用定时任务去执行即可
 									$m = array();
 									//3.1.4.1通知用户,定时任务去执行
-									if(isEmail($order['email'])){
-										$content = '用户:' . $order['email'] . ',购买的商品['.$order['productname'].'],密码是:'.$card_mi_str;
-										$m[]=array('email'=>$order['email'],'subject'=>'商品购买成功','content'=>$content,'addtime'=>time(),'status'=>0);
+									if(isset($web_config['emailswitch']) AND $web_config['emailswitch']>0){
+										if(isEmail($order['email'])){
+											$content = '用户:' . $order['email'] . ',购买的商品['.$order['productname'].'],密码是:'.$card_mi_str;
+											$m[]=array('email'=>$order['email'],'subject'=>'商品购买成功','content'=>$content,'addtime'=>time(),'status'=>0);
+										}	
 									}
 									//3.1.4.2通知管理员,定时任务去执行
 									if(isEmail($web_config['adminemail'])){
@@ -97,6 +99,10 @@ class notify
 									
 									if(!empty($m)){
 										$m_email_queue->MultiInsert($m);
+										if($web_config['emailsendtypeswitch']>0){
+											$send_email = new \Sendemail();
+											$send_email->send($m);
+										}
 									}
 									$data =array('code'=>1,'msg'=>'自动发卡');
 								}else{
@@ -106,9 +112,11 @@ class notify
 									//3.2.3邮件通知写到消息队列中，然后用定时任务去执行即可
 									$m = array();
 									//3.2.3.1通知用户,定时任务去执行
-									if(isEmail($order['email'])){
-										$content = '用户:' . $order['email'] . ',购买的商品['.$order['productname'].'],由于库存不足暂时无法处理,管理员正在拼命处理中....请耐心等待!';
-										$m[] = array('email'=>$order['email'],'subject'=>'商品购买成功','content'=>$content,'addtime'=>time(),'status'=>0);
+									if(isset($web_config['emailswitch']) AND $web_config['emailswitch']>0){
+										if(isEmail($order['email'])){
+											$content = '用户:' . $order['email'] . ',购买的商品['.$order['productname'].'],由于库存不足暂时无法处理,管理员正在拼命处理中....请耐心等待!';
+											$m[] = array('email'=>$order['email'],'subject'=>'商品购买成功','content'=>$content,'addtime'=>time(),'status'=>0);
+										}
 									}
 									//3.2.3.2通知管理员,定时任务去执行
 									if(isEmail($web_config['adminemail'])){
@@ -118,6 +126,10 @@ class notify
 									
 									if(!empty($m)){
 										$m_email_queue->MultiInsert($m);
+										if($web_config['emailsendtypeswitch']>0){
+											$send_email = new \Sendemail();
+											$send_email->send($m);
+										}
 									}
 									$data =array('code'=>1,'msg'=>'库存不足,无法处理');
 								}
@@ -131,9 +143,11 @@ class notify
 								//4.2邮件通知写到消息队列中，然后用定时任务去执行即可
 								$m = array();
 								//4.2.1通知用户,定时任务去执行
-								if(isEmail($order['email'])){
-									$content = '用户:' . $order['email'] . ',购买的商品['.$order['productname'].'],属于手工发货类型，管理员即将联系您....请耐心等待!';
-									$m[] = array('email'=>$order['email'],'subject'=>'商品购买成功','content'=>$content,'addtime'=>time(),'status'=>0);
+								if(isset($web_config['emailswitch']) AND $web_config['emailswitch']>0){
+									if(isEmail($order['email'])){
+										$content = '用户:' . $order['email'] . ',购买的商品['.$order['productname'].'],属于手工发货类型，管理员即将联系您....请耐心等待!';
+										$m[] = array('email'=>$order['email'],'subject'=>'商品购买成功','content'=>$content,'addtime'=>time(),'status'=>0);
+									}
 								}
 								//4.2.2通知管理员,定时任务去执行
 								if(isEmail($web_config['adminemail'])){
@@ -145,6 +159,10 @@ class notify
 								}
 								if(!empty($m)){
 									$m_email_queue->MultiInsert($m);
+									if($web_config['emailsendtypeswitch']>0){
+										$send_email = new \Sendemail();
+										$send_email->send($m);
+									}
 								}
 								$data =array('code'=>1,'msg'=>'手工订单');
 							}

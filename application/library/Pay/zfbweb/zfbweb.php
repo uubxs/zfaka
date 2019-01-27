@@ -26,7 +26,7 @@ class zfbweb
 			'sign_type' => $payconfig['sign_type'],
 			'ali_public_key' => $payconfig['ali_public_key'],
 			'rsa_private_key' => $payconfig['rsa_private_key'],
-			'return_url' => $params['weburl']. '/product/query/?zlkbmethod=auto&paymethod='.$this->paymethod.'&orderid='.$params['orderid'],
+			'return_url' => $params['weburl']. "/query/auto/{$params['orderid']}.html",
 			'notify_url' => $params['weburl'] . '/product/notify/?paymethod='.$this->paymethod,
 			'return_raw' => true
 		];
@@ -43,7 +43,7 @@ class zfbweb
 				$result = array('type'=>1,'subjump'=>0,'paymethod'=>$this->paymethod,'url'=>$url,'payname'=>$payconfig['payname'],'overtime'=>$payconfig['overtime'],'money'=>$params['money']);
 				return array('code'=>1,'msg'=>'success','data'=>$result);
 			}else{
-				return array('code'=>1002,'msg'=>'生成失败','data'=>'');
+				return array('code'=>1002,'msg'=>'支付接口请求失败','data'=>'');
 			}
 		} catch (PayException $e) {
 			return array('code'=>1001,'msg'=>$e->errorMessage(),'data'=>'');

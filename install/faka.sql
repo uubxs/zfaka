@@ -90,7 +90,7 @@ INSERT INTO `t_config` (`id`, `catid`, `name`, `value`, `tag`, `lock`, `updateti
 (13, 1, 'logo', '/res/images/logo.png', 'LOGO地址,默认：/res/images/logo.png', 1, 1453452674),
 (14, 1, 'tongji', '<!--统计js-->', '统计脚本', 1, 1453452674),
 (15, 1, 'mprodcutdescriptionswitch', '0', '移动端商品详情，隐藏(0)|显示(1)', 1, 1453452674),
-(16, 1, 'orderprefix', 'zlkb', '订单前缀，建议不要超过5个字符串', 1, 1453452674),
+(16, 1, 'orderprefix', 'zlkb', '订单前缀，只能是英文和数字,且长度不要超过5个字符串建议不要超过5个字符串', 1, 1453452674),
 (17, 1, 'backgroundimage', 'https://gss0.baidu.com/-fo3dSag_xI4khGko9WTAnF6hhy/zhidao/pic/item/6a600c338744ebf894c9e667dff9d72a6059a72a.jpg', '前台背景图片地址', 1, 1453452674),
 (18, 1, 'headermenucolor', 'layui-bg-black', '前台顶部菜单配色方案', 1, 1453452674),
 (19, 1, 'mousejqtx', '', '鼠标特效', 1, 1453452674),
@@ -100,7 +100,11 @@ INSERT INTO `t_config` (`id`, `catid`, `name`, `value`, `tag`, `lock`, `updateti
 (23, 1, 'adminyzmswitch', '1', '后台登录验证码开关', 1, 1453452674),
 (24, 1, 'shortcuticon', '', 'ICO图标,格式必须是png或者ico或者gif', 1, 1453452674),
 (25, 1, 'limitorderqty', '5', '单笔订单数量限制', 1, 1453452674),
-(26, 1, 'discountswitch', '0', '折扣开关', 1, 1453452674);
+(26, 1, 'discountswitch', '0', '折扣开关', 1, 1453452674),
+(27, 1, 'qrserver', '/product/order/showqr/?url=', '生成二维码的服务地址,默认请填写:/product/order/showqr/?url=', 1, 1453452674),
+(28, 1, 'paysubjectswitch', '0', '订单说明显示:0商品名,1订单号', 1, 1453452674),
+(29, 1, 'tplproduct', 'default', '商品详情页模版', '1', 1546063186),
+(30, 1, 'emailswitch', '1', '发送用户邮件开关', '1', 1546063186);
 -- --------------------------------------------------------
 
 --
@@ -238,7 +242,7 @@ CREATE TABLE IF NOT EXISTS `t_payment` (
   `payname` varchar(55) NOT NULL DEFAULT '' COMMENT '显示名称',
   `payimage` varchar(250) NOT NULL DEFAULT '' COMMENT '图片',
   `alias` varchar(55) NOT NULL DEFAULT '' COMMENT '别名',
-  `sign_type` enum('RSA','RSA2','MD5') NOT NULL DEFAULT 'RSA2',
+  `sign_type` enum('RSA','RSA2','MD5','HMAC-SHA256') NOT NULL DEFAULT 'RSA2',
   `app_id` varchar(255) NOT NULL DEFAULT '',
   `app_secret` varchar(255) NOT NULL DEFAULT '',
   `ali_public_key` text,
@@ -261,7 +265,8 @@ INSERT INTO `t_payment` (`id`, `payment`, `payname`, `payimage`, `alias`, `sign_
 (6, '微信扫码支付', '微信', '/res/images/pay/weixin.jpg', 'wxf2f', 'MD5', '', '', '', '', '', 0, 0),
 (7, '有赞接口', '微信', '/res/images/pay/yzpay.jpg', 'yzpay', 'RSA2', '', '', '', '', '', 0, 0),
 (8, '收款宝(微信)', '微信', '/res/images/pay/weixin.jpg', 'zlkbcodepaywx', 'RSA2', '', '', '', '', '', 300, 0),
-(9, '收款宝(支付宝)', '支付宝', '/res/images/pay/alipay.jpg', 'zlkbcodepayalipay', 'RSA2', '', '', '', '', '', 300, 0);
+(9, '收款宝(支付宝)', '支付宝', '/res/images/pay/alipay.jpg', 'zlkbcodepayalipay', 'RSA2', '', '', '', '', '', 300, 0),
+(10, '收款宝(QQ)', 'QQ', '/res/images/pay/qqpay.jpg', 'zlkbcodepayqq', 'RSA2', '', '', '', '', '', 300, 0);
 
 -- --------------------------------------------------------
 
@@ -283,7 +288,8 @@ CREATE TABLE IF NOT EXISTS `t_products` (
   `addons` text NOT NULL COMMENT '备注',
   `sort_num` int(11) NOT NULL DEFAULT '1' COMMENT '排序',
   `addtime` int(11) NOT NULL DEFAULT '0' COMMENT '添加时间',
-  `isdelete` tinyint(1) NOT NULL DEFAULT '0' COMMENT '0未删除,1已删除'
+  `isdelete` tinyint(1) NOT NULL DEFAULT '0' COMMENT '0未删除,1已删除',
+  `imgurl` text NOT NULL DEFAULT '' COMMENT '产品图片'
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
 
 --
@@ -428,10 +434,22 @@ CREATE TABLE IF NOT EXISTS `t_user_login_logs` (
   `addtime` int(11) NOT NULL DEFAULT '0' COMMENT '登录时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+
+CREATE TABLE IF NOT EXISTS `t_products_pifa` (
+  `id` int(11) NOT NULL,
+  `pid` int(11) NOT NULL DEFAULT '0' COMMENT '商品d',
+  `qty` int(11) NOT NULL DEFAULT '0' COMMENT '数量',
+  `discount` decimal(10,2) NOT NULL DEFAULT '0.00' COMMENT '优惠价格',
+  `tag` varchar(255) NOT NULL COMMENT '简单说明',
+  `addtime` int(11) NOT NULL DEFAULT '0' COMMENT '添加时间',
+  `isdelete` tinyint(1) NOT NULL DEFAULT '0' COMMENT '0未删除,1已删除'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 --
 -- Indexes for dumped tables
 --
-
+ALTER TABLE `t_products_pifa`
+  ADD PRIMARY KEY (`id`);
 --
 -- Indexes for table `t_admin_login_log`
 --
@@ -632,6 +650,10 @@ ALTER TABLE `t_user_group`
 --
 -- AUTO_INCREMENT for table `t_user_login_logs`
 --
+
+ALTER TABLE `t_products_pifa`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  
 ALTER TABLE `t_user_login_logs`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -42,13 +42,9 @@
     <a class="layui-btn layui-btn-warm layui-btn-xs" href="/product/{{d.id}}.html">购买</a>
 	{{# } }}
 </script>
+<div id="layerad" style="display: none;"><?php echo $config['layerad'];?></div>
 <!--引入公共底文件-->
 <?php include COMMON_PATH.'/footer.html';?>
 <script>
 layui.use('product-list');
-<?php if(isset($config['layerad']) AND strlen($config['layerad'])>0):?>
-var LAYERAD = "<?php echo $config['layerad'];?>";
-<?php else:?>
-var LAYERAD = "";
-<?php endif;?>
 </script>
